@@ -1,18 +1,56 @@
+/***************************************************
+  This is our GFX example for the Adafruit ILI9341 Breakout and Shield
+  ----> http://www.adafruit.com/products/1651
+
+  Check out the links above for our tutorials and wiring diagrams
+  These displays use SPI to communicate, 4 or 5 pins are required to
+  interface (RST is optional)
+  Adafruit invests time and resources providing this open source code,
+  please support Adafruit and open-source hardware by purchasing
+  products from Adafruit!
+
+  Written by Limor Fried/Ladyada for Adafruit Industries.
+  MIT license, all text above must be included in any redistribution
+ ****************************************************/
+
+
 #include "SPI.h"
 #include "Adafruit_GFX.h"
 #include "Adafruit_ILI9341.h"
 
+// For the Adafruit shield, these are the default.
 #define TFT_DC 9
 #define TFT_CS 10
+#define TFT_MOSI 11
+#define TFT_CLK 13
+#define TFT_RST 8
+#define TFT_MISO 12
 
 // Use hardware SPI (on Uno, #13, #12, #11) and the above for CS/DC
-Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
+//Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
+// If using the breakout, change pins as desired
+Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_CLK, TFT_RST, TFT_MISO);
 
 void setup() {
   Serial.begin(9600);
   Serial.println("ILI9341 Test!"); 
  
   tft.begin();
+
+  // read diagnostics (optional but can help debug problems)
+  uint8_t x = tft.readcommand8(ILI9341_RDMODE);
+  Serial.print("Display Power Mode: 0x"); Serial.println(x, HEX);
+  x = tft.readcommand8(ILI9341_RDMADCTL);
+  Serial.print("MADCTL Mode: 0x"); Serial.println(x, HEX);
+  x = tft.readcommand8(ILI9341_RDPIXFMT);
+  Serial.print("Pixel Format: 0x"); Serial.println(x, HEX);
+  x = tft.readcommand8(ILI9341_RDIMGFMT);
+  Serial.print("Image Format: 0x"); Serial.println(x, HEX);
+  x = tft.readcommand8(ILI9341_RDSELFDIAG);
+  Serial.print("Self Diagnostic: 0x"); Serial.println(x, HEX); 
+  
+  Serial.println(F("Benchmark                Time (microseconds)"));
+  delay(10);
   Serial.print(F("Screen fill              "));
   Serial.println(testFillScreen());
   delay(500);
@@ -44,12 +82,20 @@ void setup() {
   Serial.println(testCircles(10, ILI9341_WHITE));
   delay(500);
 
+  Serial.print(F("Triangles (outline)      "));
+  Serial.println(testTriangles());
+  delay(500);
+
   Serial.print(F("Triangles (filled)       "));
   Serial.println(testFilledTriangles());
   delay(500);
 
   Serial.print(F("Rounded rects (outline)  "));
   Serial.println(testRoundRects());
+  delay(500);
+
+  Serial.print(F("Rounded rects (filled)   "));
+  Serial.println(testFilledRoundRects());
   delay(500);
 
   Serial.println(F("Done!"));
@@ -93,14 +139,17 @@ unsigned long testText() {
   tft.println();
   tft.setTextColor(ILI9341_GREEN);
   tft.setTextSize(5);
-  tft.println("Salut");
+  tft.println("Groop");
   tft.setTextSize(2);
-  tft.println("Test!");
+  tft.println("I implore thee,");
   tft.setTextSize(1);
-  tft.println("Acum testam display-ul");
-  tft.println("Acum testam display-ul");
-  tft.println("Wow");
-  tft.println("MERGE!");
+  tft.println("my foonting turlingdromes.");
+  tft.println("And hooptiously drangle me");
+  tft.println("with crinkly bindlewurdles,");
+  tft.println("Or I will rend thee");
+  tft.println("in the gobberwarts");
+  tft.println("with my blurglecruncheon,");
+  tft.println("see if I don't!");
   return micros() - start;
 }
 
@@ -246,6 +295,25 @@ unsigned long testCircles(uint8_t radius, uint16_t color) {
   return micros() - start;
 }
 
+unsigned long testTriangles() {
+  unsigned long start;
+  int           n, i, cx = tft.width()  / 2 - 1,
+                      cy = tft.height() / 2 - 1;
+
+  tft.fillScreen(ILI9341_BLACK);
+  n     = min(cx, cy);
+  start = micros();
+  for(i=0; i<n; i+=5) {
+    tft.drawTriangle(
+      cx    , cy - i, // peak
+      cx - i, cy + i, // bottom left
+      cx + i, cy + i, // bottom right
+      tft.color565(i, i, i));
+  }
+
+  return micros() - start;
+}
+
 unsigned long testFilledTriangles() {
   unsigned long start, t = 0;
   int           i, cx = tft.width()  / 2 - 1,
@@ -278,6 +346,23 @@ unsigned long testRoundRects() {
   for(i=0; i<w; i+=6) {
     i2 = i / 2;
     tft.drawRoundRect(cx-i2, cy-i2, i, i, i/8, tft.color565(i, 0, 0));
+  }
+
+  return micros() - start;
+}
+
+unsigned long testFilledRoundRects() {
+  unsigned long start;
+  int           i, i2,
+                cx = tft.width()  / 2 - 1,
+                cy = tft.height() / 2 - 1;
+
+  tft.fillScreen(ILI9341_BLACK);
+  start = micros();
+  for(i=min(tft.width(), tft.height()); i>20; i-=6) {
+    i2 = i / 2;
+    tft.fillRoundRect(cx-i2, cy-i2, i, i, i/8, tft.color565(0, i, 0));
+    yield();
   }
 
   return micros() - start;
