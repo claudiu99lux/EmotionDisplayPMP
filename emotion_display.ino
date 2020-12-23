@@ -5,6 +5,7 @@
 #include <gfxfont.h>
 #include "SPI.h"
 #include <Adafruit_ILI9341.h>
+#include<SoftwareSerial.h>
 
 #define TFT_DC 9
 #define TFT_CS 10
@@ -15,15 +16,32 @@
 
 #define DEG2RAD 0.0174532925
 
+SoftwareSerial BT(51, 50);  //RX = 51; TX = 50
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_CLK, TFT_RST, TFT_MISO);
+char selectedAnimation = '0';
 
 void setup() {
+  BT.begin(9600);
   tft.begin();
   tft.setRotation(1);
+  waitingScreen();
 }
 
 void loop(void) {
-  christmas();
+  if (BT.available())  //verificam daca vin date de la telefon
+  {
+    selectedAnimation = BT.read();    //citim datele si le convertim in int
+    if(selectedAnimation == '1')
+      smile();
+    else if(selectedAnimation == '2')
+      frown();
+    else if(selectedAnimation == '3')
+      wink();
+    else if(selectedAnimation == '4')
+      christmas();
+    else
+      waitingScreen();
+  }
 }
 
 void smile(){
@@ -36,7 +54,7 @@ void smile(){
   
   drawEyesAndGlasses(x1, x2, y, raza);
  
-  while(1){
+  while(selectedAnimation == '1' && !BT.available()){
     //Coordonate gura
     int x_centru_gura = tft.width()/2;
     int y_centru_gura = tft.height()/2 + 10;
@@ -65,7 +83,7 @@ void frown(){
   //desenam ochii
   drawEyesAndGlasses(x1, x2, y, raza);
  
-  while(1){
+  while(selectedAnimation == '2' && !BT.available()){
     //Coordonate gura
     int x_centru_gura = tft.width()/2;
     int y_centru_gura = 0;
@@ -106,7 +124,7 @@ void wink(){
   drawArcElipsa(x_centru_gura, y_centru_gura, unghi_start, nr_seg_gura, rx-grosime, ry-grosime, grosime/1.5, ILI9341_WHITE);
   drawArcElipsa(x_centru_gura, y_centru_gura, unghi_start, nr_seg_gura, rx, ry, grosime, ILI9341_BLACK);
   // facem ochiul stang sa clipeasca
-  while(1){
+  while(selectedAnimation == '3' && !BT.available()){
     delay(1500);
     // forma U
     drawArcElipsa(x2, y-10, 270, 60, raza, raza, 0.25*raza, ILI9341_BLACK);
@@ -150,7 +168,7 @@ void christmas(){
     tft.fillTriangle(x[etaj][0], y[etaj][0], x[etaj][1], y[etaj][1], x[etaj][2], y[etaj][2], ILI9341_DARKGREEN);
   }
 
-  while (1) {
+  while (selectedAnimation == '4' && !BT.available()) {
     for (int layer = 0; layer < 6; layer++) {
       for (int corner = 0; corner < 3; corner++) {
         tft.fillCircle(x[layer][corner], y[layer][corner], w/40, rainbow(random(128)));
@@ -160,7 +178,13 @@ void christmas(){
     //adaugam o lumina si deasupra tulpinii
     tft.fillCircle(x[0][0], y[0][1], w/40, rainbow(random(128)));
   }
-  
+}
+
+void waitingScreen(){
+  tft.fillScreen(ILI9341_LIGHTGREY);
+  tft.fillRoundRect(30, 30, 260, 180, 10, ILI9341_OLIVE);
+  tft.fillCircle(160, 120, 50, ILI9341_MAROON);
+  tft.fillCircle(160, 120, 30, ILI9341_BLUE);
 }
 
 unsigned int rainbow(int valoare)
