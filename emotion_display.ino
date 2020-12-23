@@ -23,7 +23,7 @@ void setup() {
 }
 
 void loop(void) {
-  wink();
+  christmas();
 }
 
 void smile(){
@@ -125,6 +125,77 @@ void wink(){
     for(int i=4; i>=0; i--)
       tft.fillCircle(x2, y-5*i, raza/2, ILI9341_BLACK);
   }
+}
+
+void christmas(){
+  tft.fillScreen(ILI9341_BLACK);
+  //in matrici stocam coordonatele triunghiurilor
+  int x[6][3];
+  int y[6][3];
+  int w = tft.width();
+  int h = tft.height();
+  
+  for (int etaj = 0; etaj < 6; etaj++) {
+    x[etaj][0] = w/2;
+    y[etaj][0] = (etaj+1) * h/8 + h/8; // adunam la final un h/8 pentru ca acesta este varful de sus al triunghiului
+    x[etaj][1] = w/2 - (6-etaj) * w/16;
+    y[etaj][1] = (etaj+1) * h/8;
+    x[etaj][2] = w/2 + (6-etaj) * w/16;;
+    y[etaj][2] = (etaj+1) * h/8;
+  }
+
+  tft.fillRect(w/2-w/16, 0, w/8, h/8, ILI9341_DARKGREY); // latimea e w/8, setam x ca mijloc minus x/16 ca sa fie centrata tulpina
+
+  for (int etaj = 0; etaj < 6; etaj++) {
+    tft.fillTriangle(x[etaj][0], y[etaj][0], x[etaj][1], y[etaj][1], x[etaj][2], y[etaj][2], ILI9341_DARKGREEN);
+  }
+
+  while (1) {
+    for (int layer = 0; layer < 6; layer++) {
+      for (int corner = 0; corner < 3; corner++) {
+        tft.fillCircle(x[layer][corner], y[layer][corner], w/40, rainbow(random(128)));
+        delay(10);
+      }
+    }
+    //adaugam o lumina si deasupra tulpinii
+    tft.fillCircle(x[0][0], y[0][1], w/40, rainbow(random(128)));
+  }
+  
+}
+
+unsigned int rainbow(int valoare)
+{
+  // valoare intre 0-127
+  // vom returna o valoare pe 16 biti care reprezinta culoarea
+  // aceasta metoda de generare culori am realizat-o combinand informatiile despre culori gasite pe forumurile arduino
+
+  byte red = 0; //red reprezinta cei mai semnificativi 5 biti
+  byte green = 0; //green reprezinta urmatorii 6 biti
+  byte blue = 0; //blue reprezinta cei mai putin semnificativi 5 biti
+
+  byte quadrant = valoare / 32;
+
+  if (quadrant == 0) {
+    blue = 31;
+    green = 2 * (valoare % 32);
+    red = 0;
+  }
+  if (quadrant == 1) {
+    blue = 31 - (valoare % 32);
+    green = 63;
+    red = 0;
+  }
+  if (quadrant == 2) {
+    blue = 0;
+    green = 63;
+    red = valoare % 32;
+  }
+  if (quadrant == 3) {
+    blue = 0;
+    green = 63 - 2 * (valoare % 32);
+    red = 31;
+  }
+  return (red << 11) + (green << 5) + blue;
 }
 
 
