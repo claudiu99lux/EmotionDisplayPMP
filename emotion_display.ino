@@ -23,7 +23,7 @@ void setup() {
 }
 
 void loop(void) {
-  frown();
+  wink();
 }
 
 void smile(){
@@ -84,6 +84,48 @@ void frown(){
   }
 }
 
+void wink(){
+  tft.fillScreen(ILI9341_YELLOW);
+  //Coordonate ochi
+  int x1 = 102;
+  int y = 195;
+  int x2 = 218;
+  int raza = 28;
+  
+  drawEyesAndGlasses(x1, x2, y, raza);
+  
+  //Coordonate gura
+  int x_centru_gura = tft.width()/2;
+  int y_centru_gura = tft.height()/2 + 10;
+  int nr_seg_gura = 40; // 40*3 = 120 grade
+  int grosime = 22; // grosime 45 arata ok
+  int rx = 150;
+  int ry = 120;
+  int unghi_start = 300;
+  // desenam gura
+  drawArcElipsa(x_centru_gura, y_centru_gura, unghi_start, nr_seg_gura, rx-grosime, ry-grosime, grosime/1.5, ILI9341_WHITE);
+  drawArcElipsa(x_centru_gura, y_centru_gura, unghi_start, nr_seg_gura, rx, ry, grosime, ILI9341_BLACK);
+  // facem ochiul stang sa clipeasca
+  while(1){
+    delay(1500);
+    // forma U
+    drawArcElipsa(x2, y-10, 270, 60, raza, raza, 0.25*raza, ILI9341_BLACK);
+    //inchidem ochiul deasupra
+    tft.fillCircle(x2, y, raza+2, ILI9341_YELLOW);
+    //inchidem ochiul sub U
+    drawArcElipsa(x2, y-10, 270, 60, 1.5*raza, 1.5*raza, 0.5*raza, ILI9341_YELLOW);
+    delay(1500);
+    //desenam ochiul din nou de jos in sus
+    //sub U
+    drawArcElipsa(x2, y-10, 285, 50, raza, raza+5, 0.2*raza, ILI9341_WHITE);
+    //ochi
+    for(int i=2; i>=0; i--)
+      tft.fillCircle(x2, y-10*i, raza, ILI9341_WHITE);
+    // pupila
+    for(int i=4; i>=0; i--)
+      tft.fillCircle(x2, y-5*i, raza/2, ILI9341_BLACK);
+  }
+}
 
 
 void drawEyesAndGlasses(int x1, int x2, int y, int raza){
