@@ -23,7 +23,7 @@ void setup() {
 }
 
 void loop(void) {
-  smile();
+  frown();
 }
 
 void smile(){
@@ -52,6 +52,35 @@ void smile(){
     delay(1000);
     // stergem gura (de fapt desenam culoarea background peste, nu putem sterge altfel)
     drawArcElipsa(160, 130, 300, 40, rx, ry, grosime*2, ILI9341_YELLOW);
+  }
+}
+
+void frown(){
+  tft.fillScreen(ILI9341_YELLOW);
+  //Coordonate ochi
+  int x1 = 102;
+  int y = 195;
+  int x2 = 218;
+  int raza = 28;
+  //desenam ochii
+  drawEyesAndGlasses(x1, x2, y, raza);
+ 
+  while(1){
+    //Coordonate gura
+    int x_centru_gura = tft.width()/2;
+    int y_centru_gura = 0;
+    int nr_seg_gura = 40; // 40*3 = 120 grade
+    int grosime = 22; // grosime 45 arata ok
+    int rx = 140;
+    int ry = 100;
+    int unghi_start = 120;
+    // desenam gura
+    drawArcElipsa(x_centru_gura, y_centru_gura, unghi_start, nr_seg_gura, rx, ry, grosime/1.5, ILI9341_WHITE);
+    drawArcElipsa(x_centru_gura, y_centru_gura, unghi_start, nr_seg_gura, rx-grosime/1.5, ry-grosime/1.5, grosime, ILI9341_BLACK);
+    
+    delay(1000);
+    // stergem gura (de fapt desenam culoarea background peste, nu putem sterge altfel)
+    drawArcElipsa(x_centru_gura, y_centru_gura, 120, 40, rx*1.05, ry, grosime*2, ILI9341_YELLOW);
   }
 }
 
