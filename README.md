@@ -3,7 +3,7 @@
   Proiectul presupune implementarea cu ajutorul unei plăci Arduino a unor animații care să simuleze diferite emoții precum fericirea, tristețea etc. Cu ajutorul unui dispozitiv mobil se va putea selecta animația dorită, utilizatorul putând să se conecteze prin Bluetooth la placa de dezvoltare prin intermediul aplicației Android specifice: „Emotion Display Control”. 
   Display-ul propriu-zis va fi integrat într-o mască de protecție, permițând utilizatorului să afișeze diferite expresii faciale fără a fi nevoit să se expună riscului de infectare prin scoaterea măștii.
 
-#Intrucțiuni de utilizare
+Intrucțiuni de utilizare
 
 •	Instalați aplicația “Emotion Display Control” – fișierul .apk este disponibil pe pagina de git.
 
