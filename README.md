@@ -33,3 +33,6 @@ Observații:
 •	Aplicația poate rula atât în mod portret, cât și în mod landscape
 
 •	Pentru a părăsi aplicația, atingeți cele 3 puncte din colt dreapta sus și apoi selectați “Stop this Application”
+
+
+Video prezentare proiect: https://youtu.be/kJQli31UoG4
